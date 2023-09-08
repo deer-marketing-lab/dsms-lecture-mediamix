@@ -66,7 +66,7 @@ class: font150
 `r icons:::icon_style(icons::fontawesome("question", style = "solid"), scale = 1)`
 **How to evaluate the performance of marketing?**
 
-Each campaign / channel evaluated on incremental profit that it produces relative to its cost 
+Each campaign / channel is evaluated on incremental profit that it produces relative to its cost 
 
 $$
 ROI = \frac{\text{incremental profit due to advertising} - \text{cost of advertising}}{\text{cost of advertising}}
@@ -340,7 +340,7 @@ class: inverse, center, middle
 ---
 # Multivariable Regression: One Control
 
-$$Sales_i = \beta_0 + \beta_1 price_i + \beta_2 \text{promotion}_i + \varepsilon_i$$
+$$Sales_i = \beta_0 + \beta_1 price_i + \beta_2 \text{feat}_i + \varepsilon_i$$
 
 Remark: Sales in '000s.
 
@@ -365,7 +365,7 @@ Discussion Questions:
 ---
 # Multivariable Regression: One Control II
 
-$$\log(Sales)_i = \beta_0 + \beta_1 \log(price_i) + \beta_2 \text{On Promotion}_i + \varepsilon_i$$
+$$\log(Sales)_i = \beta_0 + \beta_1 \log(price_i) + \beta_2 \text{feat}_i + \varepsilon_i$$
 
 ```{r, echo = FALSE}
 summary(lm(log(sales) ~ log(price) + feat, data = oj))
@@ -376,7 +376,7 @@ summary(lm(log(sales) ~ log(price) + feat, data = oj))
 
 $$
 \begin{aligned}
-\log(Sales)_i = \beta_0 &+ \beta_1 \log(price_i) + \beta_2 \text{On Promotion}_i + \\ 
+\log(Sales)_i = \beta_0 &+ \beta_1 \log(price_i) + \beta_2 \text{feat}_i + \\ 
                         &\beta_3 \text{Tropicana}_i  + \beta_4 \text{Minute Maid}_i + \varepsilon_i
 \end{aligned}
 $$
@@ -421,7 +421,7 @@ Note:
 class: font140
 # MMM with Two Marketing Variables
 
-Suppose only spend on Facebook Ads and TV Ads, KPI is weekly revenue.
+Suppose company only spends on Facebook Ads and TV Ads, KPI is weekly revenue.
 
 Then form a regression model:
 
@@ -466,7 +466,7 @@ where:
 * $t$ is a unit of time (eg. week, month, etc)
 * $Y_t$ is the KPI of interest (eg. Sales)
 * $\beta_0$ is the regression intercept
-* $X_j$ is the marketing spend for the $j$th marketing variable (eg. TV ads, Facebook Ads, Google Search Ads, etc)
+* $X_{jt}$ is the marketing spend for the $j$th marketing variable (eg. TV ads, Facebook Ads, Google Search Ads, etc)
 * $\beta_j$ is the incremental effect of one unit of $X_{jt}$
 * $m$ is the number of marketing variables 
 * $\varepsilon_t$ is the modelling error, i.e difference between predicted and actual values of the KPI
