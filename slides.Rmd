@@ -94,7 +94,7 @@ class: font160
 ---
 class: inverse, center, middle
 
-# The What & Why of Media Mix Modelling?
+# The What & Why of Media Mix Modelling
 
 ---
 class: font160
@@ -110,7 +110,7 @@ According to [Marketing Evolution](https://www.marketingevolution.com/marketing-
 <br>
 <br>
 
-.center[That sounds a lot like Attribution Modelling!]
+.center[**That sounds a lot like Attribution Modelling :(**]
 
 ---
 class: font160
@@ -118,7 +118,7 @@ class: font160
 
 A more workable definition:
 
-> Aims to **measure the correlation between total sales** in each day/week/month **and advertising spending or impressions** on that same day/week/month
+> Aims to **measure the correlation between total sales/revenue** in each day/week/month **and advertising spending or impressions** on that same day/week/month
 
 Key Differences to Attribution Modelling:
 
@@ -141,29 +141,9 @@ class: font160
 
 1. Media Mix Modelling (MMM)
   - Estimate how different marketing activities impact a KPI
-  - How? Via Linear Regression
+  - How? Via Linear Regression or some other statistical model
 2. Media Mix Optimization (MMO)
   - Adjust budget allocation across marketing activities to optimize a KPI of interest
-
-
-Discussion Q: Could you do this without data?
-
----
-class: font160
-# Media Mix Models vs Attribution
-
-**Attribution Modelling:** 
-
-* Bottoms up 
-* Individual user data 
-* Granular planning and optimization
-
-**Media Mix Modelling:**
-
-* Top down 
-* Time Series data 
-* Can account for offline variables
-* Low frequency planning and optimization
 
 ---
 class: font160
@@ -179,7 +159,7 @@ knitr::include_graphics("figs/why_mmm_company.png")
 class: font160
 # CAUTION: Media Mix vs Marketing Mix
 
-**Media Mix Modelling**
+**Media Mix Modelling**:
 
 * Seeks to understand the role each media type plays in driving the overall campaign performance. 
 
@@ -211,7 +191,7 @@ knitr::include_graphics("figs/mmm_familiarity.png")
 ---
 class: inverse, center, middle
 
-# Digression: Linear Regression Modelling
+# Detour: Linear Regression Modelling
 
 ---
 # Example: Orange Juice
@@ -303,6 +283,7 @@ oj %>%
 ```
 
 ---
+class: font150
 # Simple Linear Regression: Explaining
 
 Discussion Questions:
@@ -311,9 +292,13 @@ Discussion Questions:
 
 * Can we explain each part of the statistical output?
 
-* Interpret the regression coefficients
+* How to interpret the regression coefficients?
 
 * Does our regression line have any important properties?
+
+* Is price the only variable that contributes to demand? 
+
+* What are the implications of "omitted variables"?
 
 ---
 # Logarithmic Transformations I
@@ -364,6 +349,20 @@ summary(lm(sales ~ price + feat, data = oj))
 ```
 
 ---
+class: font150
+# Multiple Linear Regression: Explaining
+
+Discussion Questions:
+
+* Can we explain each part of the statistical output?
+
+* How to interpret the regression coefficients?
+
+* Was price the only variable that contributes to demand? 
+
+* What are the implications of "omitted variables"?
+
+---
 # Multivariable Regression: One Control II
 
 $$\log(Sales)_i = \beta_0 + \beta_1 \log(price_i) + \beta_2 \text{On Promotion}_i + \varepsilon_i$$
@@ -387,6 +386,14 @@ summary(lm(log(sales) ~ log(price) + feat + brand, data = oj))
 ```
 
 ---
+class: clear
+
+```{r, echo = FALSE, fig.align = "center", out.width="100%"}
+url <- "figs/mainevent.gif"
+knitr::include_graphics(url)
+```
+
+---
 class: inverse, center, middle
 
 # The Simple Media Mix Model
@@ -397,77 +404,89 @@ class: font160
 
 Over-arching question: 
 
-> **How does a firm's marketing activities impact sales?** 
+> **How does a firm's marketing activities impact revenue?** 
 
 Split into answer two sub-questions:
 
-> (a) *What proportion of sales can be attributed to marketing activities?*
+> (a) *What proportion of revenue can be attributed to marketing activities?*
 
-> (b) *How does each marketing channel contribute to sales?*
+> (b) *How does each marketing channel contribute to revenue?*
 
 Note: 
 
-* We are using *sales* as the KPI of interest 
-* Others possible. Rarely used. Think about what they could be & why...
-
-
+* We are using *revenue* as the KPI of interest 
+* Others possible. Rarely used. Why?
 
 ---
 class: font140
 # MMM with Two Marketing Variables
 
-Suppose only spend on YouTube Ads and TV Ads, KPI is Sales.
+Suppose only spend on Facebook Ads and TV Ads, KPI is weekly revenue.
 
 Then form a regression model:
 
 \begin{equation}
-\text{Sales}_t = \beta_0 + \beta_1 \text{YouTube Ad Spending}_t + \beta_2 \text{TV Ad Spending}_t + \varepsilon_{t}
+\text{Revenue}_t = \beta_0 + \beta_1 \text{Facebook Ad Spending}_t + \beta_2 \text{TV Ad Spending}_t + \varepsilon_{t}
 \end{equation}
 
 We can say that:
 
 * $\beta_0$ is the **baseline revenue** 
-* $\beta_1 \text{YouTube Ad Spending}$ is the **incremental revenue from YouTube Ad Spending**
+* $\beta_1 \text{YouTube Ad Spending}$ is the **incremental revenue from Facebook Ad Spending**
 * $\beta_2 \text{TV Ad Spending}$ is the **incremental revenue from TV Ad Spending**
 * $\beta_1 \text{YouTube Ad Spending} + \beta_2 \text{TV Ad Spending}$ is the **incremental revenue from all marketing spending**
 
 ---
+class: font120
+# Interpreting the Simple Media Mix Model 
+
+\begin{equation}
+\text{Revenue}_t = \beta_0 + \beta_1 \text{Facebook Ad Spending}_t + \beta_2 \text{TV Ad Spending}_t + \varepsilon_{t}
+\end{equation}
+
+```{r, echo = FALSE, message = FALSE}
+media_mix <- read_csv("data/dt_simulated_weekly.csv")
+options(scipen=999)
+
+summary(lm(revenue/1e3 ~ I(facebook_S/1e3) + I(tv_S/1000), data = media_mix))
+```
+
+---
 class: font140
-# Simple Media Mix Model
+# More Marketing Variables
 
 Consider the Linear Regression with $m$ marketing activities:
 
 \begin{equation}
-Y_t = \beta_0 + \sum_{j=0}^{m} \beta_j X_{jt} + \varepsilon_{t}
+\text{Revenue}_t = \beta_0 + \sum_{j=0}^{m} \beta_j X_{jt} + \varepsilon_{t}
 \end{equation}
 
 where: 
 
 * $t$ is a unit of time (eg. week, month, etc)
 * $Y_t$ is the KPI of interest (eg. Sales)
-* $\beta_0$ is the regression intercept / baseline in MMM
-* $X_j$ is the marketing spend for the $j$th marketing variable (eg. TV ads, Youtube Ads, Google Ads, etc)
-* $\beta_j$ is the incremental effect of one unit of $X_jt$
+* $\beta_0$ is the regression intercept
+* $X_j$ is the marketing spend for the $j$th marketing variable (eg. TV ads, Facebook Ads, Google Search Ads, etc)
+* $\beta_j$ is the incremental effect of one unit of $X_{jt}$
 * $m$ is the number of marketing variables 
 * $\varepsilon_t$ is the modelling error, i.e difference between predicted and actual values of the KPI
 
+
 ---
-class: font130
-# Interpreting the Simple Media Mix Model 
+# More Marketing Variables: In Practice
 
-Consider Two Activity Model (YouTube and TV Ads only)
+```{r, echo = FALSE, message = FALSE}
 
-* Assume that $\hat{\beta}_1 = .3$, $\hat{\beta}_2 = 0.4$
-
-What does these estimates mean?
-
-In class...
+summary(lm(revenue/1e3 ~ I(facebook_S/1e3) + I(tv_S/1000) + 
+          I(search_S/1e3) + I(print_S/1e3), data = media_mix)
+          )
+```
 
 
 ---
 class: inverse, center, middle
 
-# Extending Media Mix Models
+# Extending Media Mix Models I
 
 ---
 class: font160
@@ -482,88 +501,27 @@ Goal:
 - Estimate an impact that is true on average across all regions 
 - Estimate deviations from this average that are region specific
 
----
-# A Two Activity, Two Region Mixed Model
-
-Suppose only spend on YouTube Ads and TV Ads, KPI is Sales.
-
-Two Regions: National data, want different effects for Chicago and San Francisco.
-
-Form a regression model:
-
-\begin{align}
-\text{Sales}_{it} = \beta_0 &+ \underbrace{\beta_{1F} \text{YouTube Ad Spending}_{it} + \beta_{2F} \text{TV Ad Spending}_{it}}_{\text{Average Impacts}} \\
-                            &+ \underbrace{\beta_{1\text{Chicago}} \text{YouTube Ad Spending}_{it} + \beta_{2\text{Chicago}} \text{TV Ad Spending}_{it}}_{\text{Chicago's Deviations}} \\
-                            &+ \underbrace{\beta_{1\text{San Fran}} \text{YouTube Ad Spending}_{it} + \beta_{2\text{San Fran}} \text{TV Ad Spending}_{it}}_{San Franciso's Deviations} \\
-                            &+ \varepsilon_{it}
-\end{align}
-
-Then: 
-
-* Average Impacts: $\beta_{jF}$
-* Chicago Impacts: $\beta_{jF}$ + $\beta_{j\text{Chicago}}$
-* San Franciso Impacts: $\beta_{jF}$ + $\beta_{j\text{San Franciso}}$ 
-
-$\implies$ data must be at the region level!
+$\implies$ We need data at the region level!
 
 ---
-# Mixed Models: General Case 
-
-Consider the Linear Regression with $m$ marketing activities and $i$ regions:
-
-\begin{equation}
-Y_{it} = \beta_0 + \sum_{j=0}^{m} \beta_{j} X_{ijt} + \sum_{j=0}^{m} \beta^{(i)}_{j} X_{ijt}  + \varepsilon_{it}
-\end{equation}
-
-where: 
-
-* $t$ is a unit of time (eg. week, month, etc)
-* $Y_{it}$ is the KPI of interest (eg. Sales in Chicago in March)
-* $X_j$ is the marketing spend for the $j$th marketing variable (eg. TV ads, Youtube Ads, Google Ads, etc)
-* $\beta_j$ is the average incremental effect of one unit of $X_{jt}$
-* $\beta^{(i)}_j$ is the deviation from the average incremental effect of one unit of $X_{jt}$ in region $i$
-* $\varepsilon_{it}$ is the modelling error, i.e difference between predicted and actual values of the KPI
-
----
-class: font130
-# Interpreting Mixed Models
-
-Consider an example from the 2 marketing activity $\times$ 2 region model:
-
-* $\hat{\beta}_1 = 0.5$, $\hat{\beta}_2 = 0.75$
-* $\hat{\beta}^{\text{Chicago}}_1 = 0.5$, $\hat{\beta}^{\text{Chicago}}_2 = 0.25$
-* $\hat{\beta}^{\text{SanFran}}_1 = -0.25$, $\hat{\beta}^{\text{SanFran}}_2 = -0.5$
-
-What do these estimates mean?
-
-
-In class ...
-
----
-class: font160
+class: font140
 # State Space Models 
 
-**Extending the Strategic Vision** (again!):
+**Extending the Strategic Vision**:
 
 > *What if we believe the incremental impact of different marketing activities also differs across time?*
-
-Why would we want to do this?
 
 Goal:
 
 - Estimate an impact that is true on average across all regions and time periods
 - Estimate deviations from this average that are region and time specific
 
----
-class: font160
-# State Space Models 
+$\implies$ We need data on
 
-How to implement a state space model?
+* Revenue, and  
+* Marketing Activities 
 
-* It's still in linear regression 
-* We need the regression coefficients, $\beta$'s, to vary across regions and over time 
-* ... I'll leave out the math since it get's ugly 
-* Data requirement: We need data on Y and X's to vary across regions and over time!
+to vary across regions **and** over time!
 
 ---
 # Comparing Alternative MMM Models
@@ -572,29 +530,111 @@ How to implement a state space model?
 knitr::include_graphics("figs/contrasting_models.png")
 ```
 
+.right[
+.font70[
+Source: [Accenture (2018)](https://www.accenture.com/_acnmedia/pdf-92/accenture-market-mix-optimization.pdf)
+  ]
+]
+
+
+**Remark:** the effectiveness of advertising is varying across region or time 
+
+$\implies$ the regression coefficients vary 
+
+$\implies$ this is **not** controlling for regional differences or seasonality
+
+---
+class: inverse, center, middle
+
+# Extending Media Mix Models II
+
+---
+class: font140
+# Adding Control Variables
+
+We can add extra variables to the model:
+
+\begin{aligned}
+\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + Z_{ijt} \gamma + \alpha_i + \tau_t + \varepsilon_{it}
+\end{aligned}
+
+where
+
+* $Z_{ijt}$: other variables that influence revenue 
+
+<br>
+
+* $\alpha_i$: differences in level of revenue across region 
+
+<br>
+
+* $\tau_t$: differences in level of sales across time
+
+---
+class: font140
+# Adding Control Variables
+
+We can add extra variables to the model:
+
+\begin{aligned}
+\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + Z_{ijt} \gamma + \alpha_i + \tau_t + \varepsilon_{it}
+\end{aligned}
+
+Why might we do this?
+
+* Omitted Variable Bias 
+
+<br>
+
+* Better predictive ability
+
 ---
 class: font160
-# Non-linear Effects in MMM
+# More Complex Effects of Advertising
 
 So far assumed:
 
-- Only Spend in time period $t$ impacts KPI in $t$ 
-- Marketing activities do not have a saturation effect
+- Advertising spending in time period $t$ only impacts KPI in $t$
+  - "*Spending yesterday doesn't impact revenue today*"
 
-**These are strong assumptions!**
+<br>
+
+- Marketing activities do not have a saturation effect
+  - "*Every dollar spent per channel is equally effective*"
+
+<br>
+
+.center[**These are strong assumptions!**]
 
 ---
-class: font160
-# Non-linear Effects in MMM 
+# Temporal Effects of Advertising 
 
-Can extend MMM to allow for:
+```{r, echo = FALSE, fig.align = "center", out.width="60%"}
+url <- "figs/time_effects.png"
+knitr::include_graphics(url)
+```
 
-* **Adstock** effects 
-  - Marketing activities today can impact the future period KPI, but with less impact further into the future.
-* **Saturation**
-  - Marketing activities carry diminishing rates of return as spend increases
-* **Lagged Effectiveness**
-  - Consumers who view ads today may wait a few weeks to buy a product  
+.right[
+.font70[
+Source: [Pandey et. al. (2021)](https://www.ijert.org/research/marketing-mix-modeling-mmm-concepts-and-model-interpretation-IJERTV10IS060396.pdf)
+  ]
+]
+
+
+---
+# Non-Linear Responses to Advertising
+
+```{r, echo = FALSE, fig.align = "center", out.width="75%"}
+url <- "figs/non_linear_effects.png"
+knitr::include_graphics(url)
+```
+
+.right[
+.font70[
+Source: [Pandey et. al. (2021)](https://www.ijert.org/research/marketing-mix-modeling-mmm-concepts-and-model-interpretation-IJERTV10IS060396.pdf)
+  ]
+]
+
 
 ---
 class: inverse, center, middle
@@ -602,57 +642,73 @@ class: inverse, center, middle
 # Media Mix Optimization
 
 ---
-class: font140
+class: font160
 # Media Mix Optimization Problem 
 
 > **How to allocate a marketing budget over multiple channels?**
 
-Assume there is one KPI we want to maximize (eg. Sales):
+* Assume there is one KPI we want to maximize (eg. Revenue):
 
-* MMM tells us how marketing activities impact a KPI of interest ...
-  - ... and we can use it to predict the KPI for a given allocation of budget 
+* We can *predict* revenue based on a media mix model 
 
-* **Media Mix Optimization**: Two steps (once we have estimated a MMM)
-  - Simulate different budget allocations and their impact on a KPI, 
-  - Choose the best allocation
+* We have a fixed budget to allocate 
 
-* This is a constrained optimization problem
-  - How to do this is beyond the scope of this class...
-  - ... But the intuition is not
+Simplification for today:
+
+* We assume we want to maximize sales *this time period* only 
+* By allocating spending across channels in this time period only
+* Remark: Can be extended to set optimal strategy for multiple periods
+
+---
+class: font160
+# Media Mix Optimization Problem
+
+Think of **Media Mix Optimization** as a two step process
+
+- Simulate different budget allocations and their impact on a KPI, 
+- Choose the best allocation
+- Assumes the media mix model that predicts revenue already exists
+
+This is a constrained optimization problem
+
+- How to do this is beyond the scope of this class...
+- ... But the intuition is not
 
 ---
 class: font160
 # Media Mix Optimization 
 
-The MMO problem:
+The Media Mix Optimization problem:
 
 \begin{align}
-\max \quad &\text{Predicted Sales}_t \\
+\max \quad &\text{Predicted Revenue}_t \\
      &\text{subject to} \quad \text{Total Expenditure}_t \leq \text{Budget}_t
 \end{align}
 
-* Remark: Above is for a single unit of time
-  - Often extend to set optimal strategy for multiple periods
 
 ---
 class: font140
 # Media Mix Optimization Example
 
-In our simplest MMM problem:
+Using our two marketing activity example:
 
 \begin{align}
-\max \quad &\hat{\text{Sales}_t} \\
-     &\text{subject to} \quad \text{YouTube Ad Spending}_t + \text{TV Ad Spending}_t \leq \text{Budget}_t
+\max \quad &\hat{\text{Revenue}_t} \\
+     &\text{subject to} \quad \text{Facebook Ad Spending}_t + \text{TV Ad Spending}_t \leq \text{Budget}_t
 \end{align}
+
+<br>
 
 Equivalently:
 
 \begin{align}
-\max \quad &\underbrace{\hat{\beta}_0 + \hat{\beta}_1 \text{YouTube Ad Spending}_t + \hat{\beta_2} \text{TV Ad Spending}_t}_{\text{MMM Model}} \\
-     &\text{subject to} \quad \text{YouTube Ad Spending}_t + \text{TV Ad Spending}_t \leq \text{Budget}_t
+\max \quad &\underbrace{\hat{\beta}_0 + \hat{\beta}_1 \text{Facebook Ad Spending}_t + \hat{\beta_2} \text{TV Ad Spending}_t}_{\text{MMM Model}} \\
+     &\text{subject to} \quad \text{Facebook Ad Spending}_t + \text{TV Ad Spending}_t \leq \text{Budget}_t
 \end{align}
 
-This can be solved on a computer!
+<br>
+
+.center[**This can be solved on a computer!**]
 
 ---
 class: inverse, center, middle
@@ -660,13 +716,32 @@ class: inverse, center, middle
 # Recap
 
 ---
-class: font140
-# MMM and Causality: Reflecting
+class: font160
+# Media Mix vs Attribution Models
 
-Hard pressed to think of MMM in causal terms 
+**Attribution Modelling:** 
+
+* Bottoms up 
+* Individual user data 
+* Digital advertising only
+* High frequency planning and optimization
+
+**Media Mix Modelling:**
+
+* Top down 
+* Time Series data 
+* Can account for offline variables
+* Low frequency planning and optimization
+
+
+---
+class: font140
+# Deeper Reflections on MMM
+
+It's hard to think of Media Mix Models in causal terms 
 
 * Omitted / Lurking Variables 
-* Marketing Spending is not "as good as random"
+* Marketing Spending is **not** randomly allocated
 
 $\implies$ careful when interpreting outputs 
 
@@ -684,7 +759,7 @@ $\implies$ it's a tricky space
 class: font160
 # Summary 
 
-* Media Mix Modelling (MMM) relates a KPI (sales) to marketing activities over time 
+* Media Mix Modelling (MMM) relates a KPI (revenue) to marketing activities over time 
 
 * MMM can allow for effects of marketing to differ across regions and over time 
 
@@ -703,7 +778,7 @@ Suggested Citation:
       title={"Digital and Social Media Strategies: Media Mix Modelling"},
       author={Lachlan Deer},
       year={2022},
-      url = "https://github.com/tisem-digital-marketing/dsms-lecture-template"
+      url = "https://github.com/deer-marketing-lab/dsms-lecture-mediamix"
 }
 ```
 
