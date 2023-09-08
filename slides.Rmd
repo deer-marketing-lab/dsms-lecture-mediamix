@@ -13,7 +13,7 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
-class: font170
+class: font150
 
 # Learning Goals for this Lecture
 
@@ -27,7 +27,106 @@ class: font170
 ---
 class: inverse, center, middle
 
-# Why Media Mix Modelling & Media Mix Optimization?
+# Preliminaries
+
+---
+class: font160
+# Where Are We Now? 
+
+Course Themes:
+
+1. **Classical Approaches to Measuring Advertising Effects**
+2. Modern Evaluation of Digital Advertising Effects
+2. User Generated Content & Social Media
+3. Email & Mobile Marketing
+4. Issues in (Massive) Online Marketplaces
+5. Impact of Privacy Regulations 
+
+---
+# Wasteful Advertising Expenditures? 
+
+```{r, echo = FALSE, fig.align = "center", out.width="100%"}
+url <- "figs/wannamaker.png"
+knitr::include_graphics(url)
+```
+
+.right[
+Source: [Papergreat Blog](http://www.papergreat.com/2012/09/saturdays-postcard-wanamakers-and-1911.html)
+]
+
+---
+class: font150
+# Measuring Advertising Response
+
+`r icons:::icon_style(icons::fontawesome("bullseye", style = "solid"), scale = 1)`
+**The goal of any marketing campaign is to increase sales** 
+
+* Either short-term or long-term
+
+`r icons:::icon_style(icons::fontawesome("question", style = "solid"), scale = 1)`
+**How to evaluate the performance of marketing?**
+
+Each campaign / channel evaluated on incremental profit that it produces relative to its cost 
+
+$$
+ROI = \frac{\text{incremental profit due to advertising} - \text{cost of advertising}}{\text{cost of advertising}}
+$$
+
+---
+class: font160
+# Our learning journey... 
+
+.center[.font120[Popular techniques for estimating the incremental sales due to advertising]]
+
+*Last Week*: Marketing Attribution Rules 
+
+* Leveraging ability to track individual user data 
+
+**This Week**: Media Mix Modelling 
+
+* With "aggregate" advertising spend and sales data
+
+*Later*: Experimental Approaches
+
+- Designing "Experiments" in the field to measure incrementality
+
+
+---
+class: inverse, center, middle
+
+# The What & Why of Media Mix Modelling?
+
+---
+class: font160
+# What is Media Mix Modelling?
+
+According to [Marketing Evolution](https://www.marketingevolution.com/marketing-essentials/media-mix-modeling):
+
+<br>
+<br>
+
+> An **analysis technique** that allows marketers to **measure the impact** of their **marketing and advertising campaigns** to determine how various elements contribute to their goal, which is often to drive conversions (sales)
+
+<br>
+<br>
+
+.center[That sounds a lot like Attribution Modelling!]
+
+---
+class: font160
+# What is Media Mix Modelling?
+
+A more workable definition:
+
+> Aims to **measure the correlation between total sales** in each day/week/month **and advertising spending or impressions** on that same day/week/month
+
+Key Differences to Attribution Modelling:
+
+* Uses aggregate data
+* Longer time horizon in the analysis (months vs weeks)
+* Wider range of channels, both traditional and digital
+* Incorporate *external influences* such as seasonality, promotions 
+* Modelling done "less often"
 
 ---
 class: font160
@@ -35,18 +134,257 @@ class: font160
 
 **Seeking Answers to the following Strategic Questions:**
 
-1. How does a firm's marketing activities impact a KPI of interest? 
+1. How does a firm's marketing activities correlate to a KPI of interest? 
 2. What is the optimal mix of marketing activities for a given KPI?
 
 **Data Driven Approach**:
 
 1. Media Mix Modelling (MMM)
   - Estimate how different marketing activities impact a KPI
+  - How? Via Linear Regression
 2. Media Mix Optimization (MMO)
   - Adjust budget allocation across marketing activities to optimize a KPI of interest
 
 
 Discussion Q: Could you do this without data?
+
+---
+class: font160
+# Media Mix Models vs Attribution
+
+**Attribution Modelling:** 
+
+* Bottoms up 
+* Individual user data 
+* Granular planning and optimization
+
+**Media Mix Modelling:**
+
+* Top down 
+* Time Series data 
+* Can account for offline variables
+* Low frequency planning and optimization
+
+---
+class: font160
+# Why Media Mix Modelling?
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("figs/why_mmm_company.png")
+```
+
+.font70[Source: [IAB (2019)](https://www.iab.com/wp-content/uploads/2019/11/IAB_MMA_MTA-Guidebook_Nov-2019.pdf)]
+
+---
+class: font160
+# CAUTION: Media Mix vs Marketing Mix
+
+**Media Mix Modelling**
+
+* Seeks to understand the role each media type plays in driving the overall campaign performance. 
+
+**Marketing Mix Modelling**:
+
+* Take a more holistic view. 
+* It doesn't just consider media channels but also factors in other marketing activities 
+  * Pricing strategies, product distribution, and even macroeconomic indicators. 
+* About viewing the larger picture and determining how these varying elements interplay to impact the overall marketing performance.
+
+---
+# Media Mix Modelling is NOT so new 
+
+```{r, echo=FALSE, fig.align = "center", out.width = '60%'}
+knitr::include_graphics("figs/when_adopt_mmm.png")
+```
+
+.font70[Source: [IAB (2019)](https://www.iab.com/wp-content/uploads/2019/11/IAB_MMA_MTA-Guidebook_Nov-2019.pdf)]
+
+---
+# Companies' familiarity with MMM
+
+```{r, echo=FALSE, fig.align = "center", out.width = '60%'}
+knitr::include_graphics("figs/mmm_familiarity.png")
+```
+
+.font70[Source: [IAB (2019)](https://www.iab.com/wp-content/uploads/2019/11/IAB_MMA_MTA-Guidebook_Nov-2019.pdf)]
+
+---
+class: inverse, center, middle
+
+# Digression: Linear Regression Modelling
+
+---
+# Example: Orange Juice
+
+```{r, echo = FALSE, fig.align = "center", out.width="70%"}
+url <- "https://parade.com/.image/t_share/MTkwNTgwODY0NjExMTk4MDc3/is-orange-juice-good-for-you-jpg.jpg"
+knitr::include_graphics(url)
+```
+
+* Three Brands: Tropicana, Minute Maid and Dominicks 
+* 83 Chicagoland Stores 
+* Data on price, sales (quantity) and whether promoted
+* Want to know the price elasticity of demand. How does this change when on promotion?
+
+```{r, echo = FALSE, message = FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(broom)
+
+oj <- read_csv("data/oj.csv")
+```
+
+---
+# The Data: A Glimpse
+
+```{r, echo = FALSE}
+head(oj, n = 10)
+```
+
+---
+# The Juice: Price, Brand and Sales 
+
+.pull-left[
+```{r, echo = FALSE}
+oj %>%
+  ggplot() +
+  geom_boxplot(
+    aes(x = brand, y = price, fill = brand)
+  ) +
+  theme_bw()
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+oj %>%
+  ggplot() +
+  geom_point(
+    aes(x = log(sales/1e3), y = log(price), color = brand),
+    alpha = 0.5
+  ) +
+  theme_bw()
+```
+
+]
+
+.center[**Each brand occupies a well defined price range. Sales decrease with price**]
+
+---
+# Simple Linear Regression 
+
+$$Sales_i = \beta_0 + \beta_1 price_i + \varepsilon_i$$
+
+Remark: Sales in '000s.
+
+```{r, echo = FALSE}
+summary(lm(sales/1e3 ~ price, data = oj))
+```
+
+---
+# Visualizing the Regression Line
+
+```{r, echo = FALSE}
+oj %>%
+  ggplot() +
+  geom_point(
+    aes(x = log(sales/1e3), y = log(price), color = brand),
+    alpha = 0.5
+  ) +
+  geom_smooth(method = "lm",
+              aes(x = log(sales/1e3), y = log(price)),
+              color = "black",
+              alpha = 0.75
+              ) +
+  xlab("quantity") + 
+  ylab("price") +
+  theme_bw()
+```
+
+---
+# Simple Linear Regression: Explaining
+
+Discussion Questions:
+
+* Why is this regression line the "right" one?
+
+* Can we explain each part of the statistical output?
+
+* Interpret the regression coefficients
+
+* Does our regression line have any important properties?
+
+---
+# Logarithmic Transformations I
+
+$$\log(Sales)_i = \beta_0 + \beta_1 price_i + \varepsilon_i$$
+
+```{r, echo = FALSE}
+tidy(lm(log(sales) ~ price, data = oj))
+```
+
+**Coefficient Interpretation** (in general): 
+
+On average, a change in X by one unit, $\Delta X=1$, is associated with a $(\exp(\beta_1) - 1)*100$ % change in Y
+
+* Remark: for small $\beta_1$, $(\exp(\beta_1) - 1) \approx \beta_1$ so often you will see an interpretation that reads straight from $\beta_1$ 
+
+**Coefficient Interpretation** (this example): 
+
+---
+# Logarithmic Transformations II
+
+$$\log(Sales)_i = \beta_0 + \beta_1 \log(price_i) + \varepsilon_i$$
+
+```{r, echo = FALSE}
+tidy(lm(log(sales) ~ log(price), data = oj))
+```
+
+**Coefficient Interpretation** (in general): 
+
+On average, a 1% change in X is associated with a change in $\beta_1$ % change in Y 
+  * $\beta_1$ is the elasticity of Y with respect to X
+
+**Coefficient Interpretation** (this example): 
+
+---
+class: inverse, center, middle
+# Multivariable Regression 
+
+---
+# Multivariable Regression: One Control
+
+$$Sales_i = \beta_0 + \beta_1 price_i + \beta_2 \text{promotion}_i + \varepsilon_i$$
+
+Remark: Sales in '000s.
+
+```{r, echo = FALSE}
+summary(lm(sales ~ price + feat, data = oj))
+```
+
+---
+# Multivariable Regression: One Control II
+
+$$\log(Sales)_i = \beta_0 + \beta_1 \log(price_i) + \beta_2 \text{On Promotion}_i + \varepsilon_i$$
+
+```{r, echo = FALSE}
+summary(lm(log(sales) ~ log(price) + feat, data = oj))
+```
+
+---
+# Multivariable Regression: Many Controls
+
+$$
+\begin{aligned}
+\log(Sales)_i = \beta_0 &+ \beta_1 \log(price_i) + \beta_2 \text{On Promotion}_i + \\ 
+                        &\beta_3 \text{Tropicana}_i  + \beta_4 \text{Minute Maid}_i + \varepsilon_i
+\end{aligned}
+$$
+
+```{r, echo = FALSE}
+summary(lm(log(sales) ~ log(price) + feat + brand, data = oj))
+```
 
 ---
 class: inverse, center, middle
@@ -72,22 +410,7 @@ Note:
 * We are using *sales* as the KPI of interest 
 * Others possible. Rarely used. Think about what they could be & why...
 
----
-class: font160
-# Media Mix Models vs Attribution
 
-**Attribution Modelling:** 
-
-* Bottoms up 
-* Individual user data 
-* Granular planning and optimization
-
-**Media Mix Modelling:**
-
-* Top down 
-* Time Series data 
-* Can account for offline variables
-* Low frequency planning and optimization
 
 ---
 class: font140
