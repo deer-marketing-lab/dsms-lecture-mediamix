@@ -767,6 +767,25 @@ class: font160
 
 * Media Mix Optimization solves for optimal marketing budget allocation given the estimates from a MMM problem
 
+---
+class: font160
+# Post-Lecture Survey
+
+.pull-left[
+```{r, echo = FALSE, fig.align = "center", out.width="100%"}
+url <- "figs/survey.png"
+knitr::include_graphics(url)
+```
+]
+
+.pull-right[
+
+<br>
+<br>
+
+Fill out [this survey](https://forms.gle/hvpQdJofbF7W8TbA9) to let us know your thoughts about the lecture
+
+]
 
 ---
 # License & Citation
