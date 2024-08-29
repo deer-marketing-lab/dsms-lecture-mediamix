@@ -20,7 +20,7 @@ class: font150
 - Define 'Media Mix Modelling' (MMM) and 'Media Mix Optimization' (MMO)
 - Explain a Linear Regression Media Mix Model 
 - Interpret Simple Media Mix Model outputs
-- Identify extensions to the Simple Media Mix Model
+- Identify feasible extensions to the Simple Media Mix Model and explain how it impacts the data needed for analysis
 - Interpret output of Extended Media Mix Models 
 - Explain the intuition behind Media Mix Optimization
 
@@ -49,7 +49,7 @@ Course Themes:
 class: font160
 # Our learning journey... 
 
-.center[.font120[Popular techniques for estimating the incremental sales due to advertising]]
+.center[.font120[Popular techniques for estimating the impact of advertising on sales]]
 
 *Last Week*: Marketing Attribution Rules 
 
@@ -57,11 +57,11 @@ class: font160
 
 **This Week**: Media Mix Modelling 
 
-* With "aggregate" advertising spend and sales data
+* With aggregate data on advertising spend and sales
 
 *Later*: Experimental Approaches
 
-- Designing "experiments" in the field to measure incrementality
+- Designing "experiments" in the field to accurately measure *incrementality*
 
 ---
 # Wasteful Advertising Expenditures? 
@@ -121,15 +121,15 @@ class: font160
 
 A more workable definition:
 
-> Aims to **measure the correlation between total sales/revenue** in each day/week/month **and advertising spending or impressions** on that same day/week/month
+> Aims to **measure the correlation between total sales/revenue** in each week/month **and advertising spending or impressions** on that same week/month
 
-Key Differences to Attribution Modelling:
+**Key Differences** to Attribution Modelling:
 
 * Uses aggregate data
 * Longer time horizon in the analysis (months vs weeks)
 * Wider range of channels, both traditional and digital
-* Incorporate *external influences* such as seasonality, promotions 
-* Modelling done "less often"
+* Incorporate external influences such as seasonality, promotions 
+* Analysis done "less often"
 
 ---
 class: font160
@@ -144,7 +144,7 @@ class: font160
 
 1. Media Mix Modelling (MMM)
   - Estimate how different marketing activities impact a KPI
-  - How? Via Linear Regression or some other statistical model
+  - How? Via Linear Regression .font80[(or some other statistical model)]
 2. Media Mix Optimization (MMO)
   - Adjust budget allocation across marketing activities to optimize a KPI of interest
 
@@ -207,14 +207,17 @@ Over-arching question:
 
 Split into answer two sub-questions:
 
-> (a) *What proportion of revenue can be attributed to marketing activities?*
+(a) How does *each* marketing channel contribute to revenue?
 
-> (b) *How does each marketing channel contribute to revenue?*
+(b) *What proportion of revenue can be attributed to marketing activities?*
 
-Note: 
+
+.font70[
+Notes: 
 
 * We are using *revenue* as the KPI of interest 
 * Others possible. Rarely used. Why?
+]
 
 ---
 class: font140
@@ -222,7 +225,7 @@ class: font140
 
 Suppose company only spends on Facebook Ads and TV Ads, KPI is weekly revenue.
 
-Then form a regression model:
+Then write a regression model:
 
 \begin{equation}
 \text{Revenue}_t = \beta_0 + \beta_1 \text{Facebook Ad Spending}_t + \beta_2 \text{TV Ad Spending}_t + \varepsilon_{t}
@@ -231,9 +234,9 @@ Then form a regression model:
 We can say that:
 
 * $\beta_0$ is the **baseline revenue** 
-* $\beta_1 \text{YouTube Ad Spending}$ is the **incremental revenue from Facebook Ad Spending**
-* $\beta_2 \text{TV Ad Spending}$ is the **incremental revenue from TV Ad Spending**
-* $\beta_1 \text{YouTube Ad Spending} + \beta_2 \text{TV Ad Spending}$ is the **incremental revenue from all marketing spending**
+* $\beta_1 \text{Facebook Ad Spending}$ is the **additional revenue from Facebook Ad Spending**
+* $\beta_2 \text{TV Ad Spending}$ is the **additional revenue from TV Ad Spending**
+* $\beta_1 \text{Facebook Ad Spending} + \beta_2 \text{TV Ad Spending}$ is the **additional revenue from all marketing spending**
 
 ---
 class: font120
@@ -358,20 +361,20 @@ class: font140
 We can add extra variables to the model:
 
 \begin{aligned}
-\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + Z_{ijt} \gamma + \alpha_i + \tau_t + \varepsilon_{it}
+\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + \gamma Z_{ijt}  + \alpha_i + \tau_t + \varepsilon_{it}
 \end{aligned}
 
 where
 
-* $Z_{ijt}$: other variables that influence revenue 
+* $Z_{ijt}$: other variables that influence revenue .font70[(and correlate with $X_{ijt}$)]
 
 <br>
 
-* $\alpha_i$: differences in level of revenue across region 
+* $\alpha_i$: differences in level of revenue across region .font70[(that are constant over time)]
 
 <br>
 
-* $\tau_t$: differences in level of sales across time
+* $\tau_t$: seasonality $\rightarrow$ differences in level of sales across time  .font70[(that are the same for all regions)]
 
 ---
 class: font140
@@ -380,7 +383,7 @@ class: font140
 We can add extra variables to the model:
 
 \begin{aligned}
-\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + Z_{ijt} \gamma + \alpha_i + \tau_t + \varepsilon_{it}
+\text{Revenue}_{it} = \beta_0 + \sum_{j=0}^{m} \beta_j X_{ijt} + \gamma Z_{ijt}  + \alpha_i + \tau_t + \varepsilon_{it}
 \end{aligned}
 
 Why might we do this?
@@ -397,13 +400,14 @@ class: font160
 
 So far assumed:
 
-- Advertising spending in time period $t$ only impacts KPI in $t$
-  - "*Spending yesterday doesn't impact revenue today*"
+- "*Spending yesterday doesn't impact revenue today*"
+  - Advertising spending in time period $t$ only impacts KPI in $t$
+
 
 <br>
 
-- Marketing activities do not have a saturation effect
-  - "*Every dollar spent per channel is equally effective*"
+- "*Every dollar spent per channel is equally effective*"
+  - Marketing activities do not have a non-linear effects on sales
 
 <br>
 
@@ -524,10 +528,10 @@ class: font160
 
 **Attribution Modelling:** 
 
-* Bottoms up 
+* Bottom up 
 * Individual user data 
 * Digital advertising only
-* High frequency planning and optimization
+* High frequency planning
 
 **Media Mix Modelling:**
 
